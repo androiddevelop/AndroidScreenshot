@@ -1,3 +1,4 @@
+package cn.androiddevelop.screenshot.util;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -8,10 +9,10 @@ import com.android.ddmlib.IShellOutputReceiver;
  * @author Yuedong Li
  *
  */
-public class OutputStreamShellOutputReceiver implements IShellOutputReceiver {
+public class ShellReceiver implements IShellOutputReceiver {
 	OutputStream os; 
 
-	public OutputStreamShellOutputReceiver(OutputStream os) { 
+	public ShellReceiver(OutputStream os) { 
 		this.os = os; 
 	} 
 

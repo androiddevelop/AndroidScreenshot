@@ -1,9 +1,13 @@
+package cn.androiddevelop.screenshot.util;
+
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+
+import cn.androiddevelop.screenshot.Config;
 
 import com.android.ddmlib.AdbCommandRejectedException;
 import com.android.ddmlib.AndroidDebugBridge;
@@ -12,6 +16,12 @@ import com.android.ddmlib.RawImage;
 import com.android.ddmlib.ShellCommandUnresponsiveException;
 import com.android.ddmlib.TimeoutException;
 
+/**
+ * 实现设备截图
+ * 
+ * @author YD
+ *
+ */
 public class ScreenShot {
 
 	public IDevice device;
@@ -132,8 +142,9 @@ public class ScreenShot {
 	 */
 	private IDevice getDevice(int index) {
 		IDevice device = null;
-		// AndroidDebugBridge bridge = AndroidDebugBridge
-		// .createBridge("adb", true);// 如果代码有问题请查看API，修改此处的参数值试一下
+		// 如果代码有问题请查看API，修改此处的参数值试一下
+		// AndroidDebugBridge bridge = AndroidDebugBridge.createBridge("adb",
+		// true);
 		AndroidDebugBridge bridge = AndroidDebugBridge.createBridge();
 		waitDevicesList(bridge);
 		IDevice devices[] = bridge.getDevices();
@@ -179,36 +190,47 @@ public class ScreenShot {
 	 * 
 	 * @param x
 	 * @param y
-	 * @param isFirstClick
+	 * @param isPressDown
+	 *            是否在拖动
 	 */
-	public void clickScreen(int x, int y,boolean isFirstClick) {
+	public void clickScreen(int x, int y, boolean isPressDown) {
 		try {
-			device.executeShellCommand(
-					"sendevent /dev/input/event4 3 48 3",
-					new OutputStreamShellOutputReceiver(System.out));
-			device.executeShellCommand("sendevent /dev/input/event4 3 53 "
-					+ x, new OutputStreamShellOutputReceiver(System.out));
-			device.executeShellCommand("sendevent /dev/input/event4 3 54 "
-					+ y, new OutputStreamShellOutputReceiver(System.out));
-			device.executeShellCommand(
-					"sendevent /dev/input/event4 3 52 0",
-					new OutputStreamShellOutputReceiver(System.out));
-			device.executeShellCommand(
-					"sendevent /dev/input/event4 3 57 0",
-					new OutputStreamShellOutputReceiver(System.out));
-			device.executeShellCommand(
-					"sendevent /dev/input/event4 0 2 0",
-					new OutputStreamShellOutputReceiver(System.out));
-			device.executeShellCommand(
-					"sendevent /dev/input/event4 0 0 0",
-					new OutputStreamShellOutputReceiver(System.out));
-			if(!isFirstClick){
+			if (isPressDown) {
 				device.executeShellCommand(
-						"sendevent /dev/input/event4 0 2 0",
-						new OutputStreamShellOutputReceiver(System.out));
+						"sendevent /dev/input/event7 1 330 1",
+						new ShellReceiver(System.out));
 				device.executeShellCommand(
-						"sendevent /dev/input/event4 0 0 0",
-						new OutputStreamShellOutputReceiver(System.out));
+						"sendevent /dev/input/event7 3 58 1",
+						new ShellReceiver(System.out));
+				device.executeShellCommand("sendevent /dev/input/event7 3 53 "
+						+ x * Config.WIDTH_SCALE / Config.SCREEN_SCALE,
+						new ShellReceiver(System.out));
+				device.executeShellCommand("sendevent /dev/input/event7 3 54 "
+						+ y * Config.HEIGHT_SCALE / Config.SCREEN_SCALE,
+						new ShellReceiver(System.out));
+				device.executeShellCommand("sendevent /dev/input/event7 0 2 0",
+						new ShellReceiver(System.out));
+				device.executeShellCommand("sendevent /dev/input/event7 0 0 0",
+						new ShellReceiver(System.out));
+
+			} else {
+
+				device.executeShellCommand(
+						"sendevent /dev/input/event7 1 330 0",
+						new ShellReceiver(System.out));
+				device.executeShellCommand(
+						"sendevent /dev/input/event7 3 58 0",
+						new ShellReceiver(System.out));
+				device.executeShellCommand("sendevent /dev/input/event7 3 53 "
+						+ x * Config.WIDTH_SCALE / Config.SCREEN_SCALE,
+						new ShellReceiver(System.out));
+				device.executeShellCommand("sendevent /dev/input/event7 3 54 "
+						+ y * Config.HEIGHT_SCALE / Config.SCREEN_SCALE,
+						new ShellReceiver(System.out));
+				device.executeShellCommand("sendevent /dev/input/event7 0 2 0",
+						new ShellReceiver(System.out));
+				device.executeShellCommand("sendevent /dev/input/event7 0 0 0",
+						new ShellReceiver(System.out));
 			}
 		} catch (TimeoutException | AdbCommandRejectedException
 				| ShellCommandUnresponsiveException | IOException e) {
@@ -217,14 +239,45 @@ public class ScreenShot {
 	}
 
 	/**
+	 * 拖动
+	 * 
+	 * @param x
+	 * @param y
+	 */
+	public void drag(int x, int y) {
+		try {
+			device.executeShellCommand("sendevent /dev/input/event7 3 53 " + x
+					* Config.WIDTH_SCALE / Config.SCREEN_SCALE,
+					new ShellReceiver(System.out));
+			device.executeShellCommand("sendevent /dev/input/event7 3 54 " + y
+					* Config.HEIGHT_SCALE / Config.SCREEN_SCALE,
+					new ShellReceiver(System.out));
+			device.executeShellCommand("sendevent /dev/input/event7 0 2 0",
+					new ShellReceiver(System.out));
+			device.executeShellCommand("sendevent /dev/input/event7 0 0 0",
+					new ShellReceiver(System.out));
+		} catch (TimeoutException | AdbCommandRejectedException
+				| ShellCommandUnresponsiveException | IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * 输入字符
+	 * 
 	 * @param keycode
 	 */
-	public void inputChar(int keycode){
+	public void inputChar(int keycode) {
 		try {
-			device.executeShellCommand(
-					"input keyevent "+keycode,
-					new OutputStreamShellOutputReceiver(System.out));
+			device.executeShellCommand("sendevent /dev/input/event7 1  "
+					+ keycode + " 1", new ShellReceiver(System.out));
+			device.executeShellCommand("sendevent /dev/input/event7 0 0 0",
+					new ShellReceiver(System.out));
+
+			device.executeShellCommand("sendevent /dev/input/event7 1  "
+					+ keycode + " 0", new ShellReceiver(System.out));
+			device.executeShellCommand("sendevent /dev/input/event7 0 0 0",
+					new ShellReceiver(System.out));
 		} catch (TimeoutException | AdbCommandRejectedException
 				| ShellCommandUnresponsiveException | IOException e) {
 			e.printStackTrace();
