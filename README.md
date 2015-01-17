@@ -14,6 +14,7 @@ AndroidScreenshot
 * 鼠标左键可以模拟点击以及拖拽
 * 按键ESC模拟点击返回，H键模拟点击HOME键
 * 不同手机在存在鼠标事件时存在一定的差异,本项目是在Genymotion模拟器上测试
+* 项目依赖ddmlib.jar
 
 调整方式
 --------------
@@ -52,5 +53,5 @@ AndroidScreenshot
 
 实现原理:
 ------------
-使用ddmlib包获取手机的截图或不断更新,同时将鼠标事件传递到手机
+使用ddmlib.jar包获取手机的截图或不断更新,同时将鼠标事件传递到手机
 鼠标事件相关问题,大家有问题可以给我发送邮件> androiddevelop@qq.com
