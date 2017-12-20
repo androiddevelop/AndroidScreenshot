@@ -1,7 +1,7 @@
 AndroidScreenshot
 =================
 
-![github](http://androiddevelop.cn/github/phone.png)
+![github](phone.png)
 
 解决问题
 -------------
@@ -54,4 +54,4 @@ AndroidScreenshot
 实现原理:
 ------------
 使用ddmlib.jar包获取手机的截图或不断更新,同时将鼠标事件传递到手机
-鼠标事件相关问题,大家有问题可以给我发送邮件> androiddevelop@qq.com
+鼠标事件相关问题,大家有问题可以给我发送邮件 app@codeboy.me
